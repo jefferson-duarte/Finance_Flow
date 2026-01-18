@@ -4,7 +4,7 @@ from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import (TokenObtainPairView,
                                             TokenRefreshView)
 
-from api.views import CategoryViewSet, TransactionViewSet
+from api.views import CategoryViewSet, RegisterView, TransactionViewSet
 
 router = DefaultRouter()
 
@@ -15,6 +15,8 @@ router.register(r'transactions', TransactionViewSet, basename='transaction')
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
+
+    path('api/register/', RegisterView.as_view(), name='register'),
 
     # --- ROTAS DE AUTENTICAÇÃO ---
     path(
