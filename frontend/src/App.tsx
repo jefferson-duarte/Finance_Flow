@@ -191,281 +191,194 @@ function App() {
 
   // --- RENDERIZAÇÃO CONDICIONAL ---
 
-  // Se NÃO estiver logado, mostra a tela de Login
+  /// ... (Mantenha toda a lógica JS, imports, useEffects, etc.)
+
   if (!isAuthenticated) {
-    return <Login onLogin={() => setIsAuthenticated(true)} />;
+      return <Login onLogin={() => setIsAuthenticated(true)} />;
   }
 
-  // Se estiver logado, mostra o App normal
   return (
-    <div className="app-container" style={{ maxWidth: '600px', margin: '0 auto' }}>
-      {/* --- CABEÇALHO COM BOTÃO DE SAIR --- */}
-      <div style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: '20px',
-        borderBottom: '1px solid #ccc',
-        paddingBottom: '10px'
-      }}>
-        <h1 style={{ margin: 0 }}>💰 FinanceFlow</h1>
+    <div className="dashboard-layout">
+      
+      {/* --- BARRA LATERAL (ESQUERDA) --- */}
+      <aside className="sidebar">
+        <div className="logo">
+          <span>💰 FinanceFlow</span>
+        </div>
 
-        <button
-          onClick={handleLogout}
-          style={{
-            background: '#dc3545', // Vermelho
-            color: '#fff',
-            border: 'none',
-            padding: '8px 15px',
-            borderRadius: '5px',
-            cursor: 'pointer',
-            fontWeight: 'bold',
-            fontSize: '14px'
-          }}
-        >
-          Sair 🚪
-        </button>
-      </div>
+        <nav className="menu">
+          <button className="menu-item active">
+            📊 Dashboard
+          </button>
+          
+          <button 
+            className="menu-item" 
+            onClick={() => setShowCategoryManager(true)}
+          >
+            ⚙️ Categorias
+          </button>
+        </nav>
 
-      {/* --- NAVEGAÇÃO DE MESES --- */}
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '20px', marginBottom: '20px' }}>
-        <button onClick={prevMonth} style={{ background: 'none', border: '1px solid #ccc', borderRadius: '50%', width: '30px', height: '30px', cursor: 'pointer' }}>
-          {'<'}
+        <button onClick={handleLogout} className="btn-logout">
+          Sair do Sistema
         </button>
+      </aside>
+
+      {/* --- CONTEÚDO PRINCIPAL (DIREITA) --- */}
+      <main className="main-content">
         
-        <h2 style={{ margin: 0, textTransform: 'capitalize' }}>
-          {/* Formata a data para português (ex: "Janeiro 2024") */}
-          {currentDate.toLocaleDateString('pt-PT', { month: 'long', year: 'numeric' })}
-        </h2>
-
-        <button onClick={nextMonth} style={{ background: 'none', border: '1px solid #ccc', borderRadius: '50%', width: '30px', height: '30px', cursor: 'pointer' }}>
-          {'>'}
-        </button>
-      </div>
-
-      {/* Botão para abrir Gerenciador de Categorias */}
-      <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-        <button 
-            onClick={() => setShowCategoryManager(!showCategoryManager)}
-            style={{ 
-                background: '#6c757d', color: 'white', border: 'none', 
-                padding: '5px 15px', borderRadius: '15px', cursor: 'pointer', fontSize: '12px' 
-            }}
-        >
-            {showCategoryManager ? 'Fechar Gerenciador' : '⚙️ Gerenciar Categorias'}
-        </button>
-      </div>
-
-      {/* Renderiza o componente SE o estado for true */}
-      {showCategoryManager && (
-          <CategoryManager 
-              categories={categories} 
-              onUpdate={fetchCategories} // Passamos a função para atualizar a lista original
-              onClose={() => setShowCategoryManager(false)}
-          />
-      )}
-
-      {/* --- DASHBOARD (RESUMO) --- */}
-      <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
-
-        {/* Card Entradas */}
-        <div style={{ flex: 1, background: '#d4edda', padding: '15px', borderRadius: '8px', border: '1px solid #c3e6cb' }}>
-          <h3 style={{ margin: 0, color: '#155724' }}>Entradas</h3>
-          <p style={{ fontSize: '24px', fontWeight: 'bold', margin: '5px 0' }}>
-            R$ {income.toFixed(2)}
-          </p>
+        {/* Cabeçalho com Data */}
+        <div className="content-header">
+          <h2 style={{ margin: 0 }}>Visão Geral</h2>
+          
+          <div className="date-nav">
+            <button onClick={prevMonth}>{'<'}</button>
+            <span>{currentDate.toLocaleDateString('pt-PT', { month: 'long', year: 'numeric' })}</span>
+            <button onClick={nextMonth}>{'>'}</button>
+          </div>
         </div>
 
-        {/* Card Saídas */}
-        <div style={{ flex: 1, background: '#f8d7da', padding: '15px', borderRadius: '8px', border: '1px solid #f5c6cb' }}>
-          <h3 style={{ margin: 0, color: '#721c24' }}>Saídas</h3>
-          <p style={{ fontSize: '24px', fontWeight: 'bold', margin: '5px 0' }}>
-            R$ {expense.toFixed(2)}
-          </p>
+        {/* Gerenciador de Categorias (Modal/Overlay) */}
+        {showCategoryManager && (
+          <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 }}>
+             <CategoryManager 
+                categories={categories} 
+                onUpdate={fetchCategories} 
+                onClose={() => setShowCategoryManager(false)}
+             />
+          </div>
+        )}
+
+        {/* 1. CARDS DE RESUMO */}
+        <div className="stats-grid">
+          <div className="stat-card" style={{ borderLeft: '4px solid #10b981' }}>
+            <h3>Receitas</h3>
+            <p style={{ color: '#10b981' }}>R$ {income.toFixed(2)}</p>
+          </div>
+          <div className="stat-card" style={{ borderLeft: '4px solid #ef4444' }}>
+            <h3>Despesas</h3>
+            <p style={{ color: '#ef4444' }}>R$ {expense.toFixed(2)}</p>
+          </div>
+          <div className="stat-card" style={{ borderLeft: '4px solid #4f46e5' }}>
+            <h3>Saldo</h3>
+            <p style={{ color: balance >= 0 ? '#4f46e5' : '#ef4444' }}>R$ {balance.toFixed(2)}</p>
+          </div>
         </div>
 
-        {/* Card Saldo */}
-        <div style={{ flex: 1, background: '#e2e3e5', padding: '15px', borderRadius: '8px', border: '1px solid #d6d8db' }}>
-          <h3 style={{ margin: 0, color: '#383d41' }}>Saldo</h3>
-          <p style={{
-            fontSize: '24px',
-            fontWeight: 'bold',
-            margin: '5px 0',
-            color: balance >= 0 ? 'green' : 'red' // Muda a cor se estiver negativo
-          }}>
-            R$ {balance.toFixed(2)}
-          </p>
-        </div>
+        {/* 2. LINHA DO MEIO: FORMULÁRIO + GRÁFICO (LADO A LADO) */}
+        <div className="row-container">
+          
+          {/* Formulário (Lado Esquerdo) */}
+          <div className="card-box">
+            <h3 style={{ marginTop: 0 }}>{editingTransaction ? 'Editar Lançamento' : 'Novo Lançamento'}</h3>
+            <form onSubmit={handleSubmit}>
+              <div className="form-group">
+                <label>Descrição</label>
+                <input type="text" name="description" value={formData.description} onChange={handleInputChange} required placeholder="Ex: Conta de Luz" />
+              </div>
 
-      </div>
+              <div className="form-row">
+                <div>
+                  <label>Valor</label>
+                  <input type="number" name="amount" value={formData.amount} onChange={handleInputChange} required placeholder="0.00" />
+                </div>
+                <div>
+                  <label>Data</label>
+                  <input type="date" name="date" value={formData.date} onChange={handleInputChange} required />
+                </div>
+              </div>
 
-      {/* --- GRÁFICO DE DESPESAS --- */}
-      {expensesByCategory.length > 0 && (
-        <div style={{ marginBottom: '30px', background: '#fff', padding: '20px', borderRadius: '8px', border: '1px solid #ddd', height: '300px' }}>
-          <h3 style={{ textAlign: 'center', margin: 0 }}>Despesas por Categoria</h3>
+              <div className="form-row">
+                <div>
+                  <label>Categoria</label>
+                  <select name="category" value={formData.category} onChange={handleInputChange}>
+                    {categories.map(cat => (
+                      <option key={cat.id} value={cat.id}>{cat.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label>Tipo</label>
+                  <select name="type" value={formData.type} onChange={handleInputChange}>
+                    <option value="IN">Entrada</option>
+                    <option value="OUT">Saída</option>
+                  </select>
+                </div>
+              </div>
 
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie
-                data={expensesByCategory}
-                cx="50%" // Posição X (centro)
-                cy="50%" // Posição Y
-                outerRadius={80}
-                fill="#8884d8"
-                dataKey="value"
-                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-              >
-                {expensesByCategory.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip formatter={(value) => `R$ ${value.toFixed(2)}`} />
-              <Legend />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
-      )}
-
-      {/* --- FORMULÁRIO DE CADASTRO --- */}
-      <div style={{ background: '#f4f4f4', padding: '15px', borderRadius: '8px', marginBottom: '20px' }}>
-        <h2>Nova Transação</h2>
-        <form onSubmit={handleSubmit}>
-
-          <div style={{ marginBottom: '10px' }}>
-            <label>Descrição: </label>
-            <input
-              type="text"
-              name="description"
-              value={formData.description}
-              onChange={handleInputChange}
-              required
-            />
+              <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+                <button type="submit" className="btn-primary" style={{ background: editingTransaction ? '#f59e0b' : '' }}>
+                    {editingTransaction ? 'Salvar Alterações' : 'Adicionar Lançamento'}
+                </button>
+                {editingTransaction && (
+                    <button type="button" onClick={() => {setEditingTransaction(null); setFormData({description:'', amount:'', date:'', category: categories[0]?.id, type:'OUT'})}} className="btn-primary" style={{ background: '#9ca3af' }}>
+                        Cancelar
+                    </button>
+                )}
+              </div>
+            </form>
           </div>
 
-          <div style={{ marginBottom: '10px' }}>
-            <label>Valor: </label>
-            <input
-              type="number"
-              name="amount"
-              value={formData.amount}
-              onChange={handleInputChange}
-              required
-            />
-          </div>
-
-          <div style={{ marginBottom: '10px' }}>
-            <label>Data: </label>
-            <input
-              type="date"
-              name="date"
-              value={formData.date}
-              onChange={handleInputChange}
-              required
-            />
-          </div>
-
-          <div style={{ marginBottom: '10px' }}>
-            <label>Categoria: </label>
-            <select name="category" value={formData.category} onChange={handleInputChange}>
-              {categories.map(cat => (
-                <option key={cat.id} value={cat.id}>{cat.name}</option>
-              ))}
-            </select>
-          </div>
-
-          <div style={{ marginBottom: '10px' }}>
-            <label>Tipo: </label>
-            <select name="type" value={formData.type} onChange={handleInputChange}>
-              <option value="IN">Entrada (Receita)</option>
-              <option value="OUT">Saída (Despesa)</option>
-            </select>
-          </div>
-
-          <div style={{ display: 'flex', gap: '10px' }}>
-            <button type="submit" style={{
-              padding: '8px 16px',
-              background: editingTransaction ? '#ffc107' : '#28a745', // Amarelo se editar, Verde se criar
-              color: editingTransaction ? '#000' : '#fff',
-              border: 'none',
-              cursor: 'pointer'
-            }}>
-              {editingTransaction ? 'Salvar Alterações' : 'Adicionar Transação'}
-            </button>
-
-            {/* Botão de Cancelar Edição (só aparece se estiver editando) */}
-            {editingTransaction && (
-              <button
-                type="button"
-                onClick={() => {
-                  setEditingTransaction(null)
-                  setFormData({ description: '', amount: '', date: '', category: categories[0]?.id || '', type: 'OUT' })
-                }}
-                style={{ padding: '8px 16px', background: '#ccc', border: 'none', cursor: 'pointer' }}
-              >
-                Cancelar
-              </button>
+          {/* Gráfico (Lado Direito) */}
+          <div className="card-box" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+            <h3 style={{ marginTop: 0, marginBottom: '20px' }}>Gastos por Categoria</h3>
+            {expensesByCategory.length > 0 ? (
+              <div style={{ width: '100%', height: '250px' }}>
+                <ResponsiveContainer>
+                  <PieChart>
+                    <Pie data={expensesByCategory} dataKey="value" innerRadius={60} outerRadius={80} fill="#8884d8" paddingAngle={5}>
+                      {expensesByCategory.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip formatter={(value) => `R$ ${value.toFixed(2)}`} />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            ) : (
+              <p style={{ color: '#9ca3af' }}>Sem dados para exibir.</p>
             )}
           </div>
-        </form>
-      </div>
 
-      {/* --- LISTAGEM --- */}
-      <div className="transaction-list">
-        <h3>Histórico</h3>
+        </div>
 
-        {transactions.map((transaction) => (
-          <div key={transaction.id} style={{
-            borderBottom: '1px solid #ddd',
-            padding: '10px 0',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center' // Alinha o botão com o texto
-          }}>
-            <div>
-              <strong>{transaction.description}</strong> ({transaction.category_name})
-              <br />
-              <small>{transaction.date}</small>
-            </div>
+        {/* 3. LISTA DE TRANSAÇÕES */}
+        <div className="transaction-list">
+          {/* Título fica FORA da área de scroll */}
+          <h3 style={{ marginTop: 0, marginBottom: '15px', borderBottom: '1px solid #eee', paddingBottom: '10px' }}>
+            Histórico Recente
+          </h3>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <span style={{ color: transaction.type === 'IN' ? 'green' : 'red', fontWeight: 'bold' }}>
-                {transaction.type === 'IN' ? '+' : '-'} R$ {transaction.amount}
-              </span>
+          {/* Nova DIV que contem apenas os itens e tem o scroll */}
+          <div className="list-content">
+            
+            {transactions.map((transaction) => (
+              <div key={transaction.id} className="transaction-item">
+                <div>
+                  <strong style={{ display: 'block', fontSize: '1.1rem' }}>{transaction.description}</strong>
+                  <small style={{ color: '#6b7280' }}>{transaction.date} • {transaction.category_name}</small>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                  <span style={{ fontWeight: 'bold', color: transaction.type === 'IN' ? '#10b981' : '#ef4444' }}>
+                    {transaction.type === 'IN' ? '+' : '-'} R$ {transaction.amount}
+                  </span>
+                  <button onClick={() => handleEdit(transaction)} style={{ border: 'none', background: 'none', cursor: 'pointer' }}>✏️</button>
+                  <button onClick={() => handleDelete(transaction.id)} style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#ef4444' }}>🗑️</button>
+                </div>
+              </div>
+            ))}
 
-              {/* Botão Editar ✏️ */}
-              <button
-                onClick={() => handleEdit(transaction)}
-                style={{
-                  background: '#ffc107',
-                  color: 'black',
-                  border: 'none',
-                  padding: '5px 10px',
-                  borderRadius: '4px',
-                  cursor: 'pointer'
-                }}
-              >
-                Editar
-              </button>
-
-              {/* Botão Excluir */}
-              <button
-                onClick={() => handleDelete(transaction.id)}
-                style={{
-                  background: '#dc3545',
-                  color: 'white',
-                  border: 'none',
-                  padding: '5px 10px',
-                  borderRadius: '4px',
-                  cursor: 'pointer'
-                }}
-              >
-                X
-              </button>
-            </div>
-
+            {transactions.length === 0 && (
+              <p style={{ textAlign: 'center', color: '#9ca3af', padding: '20px' }}>
+                Nenhum lançamento neste mês.
+              </p>
+            )}
+            
           </div>
-        ))}
-      </div>
+        </div>
+
+      </main>
     </div>
   )
 }
