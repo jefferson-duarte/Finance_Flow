@@ -3,6 +3,7 @@ import api from './api'
 import './App.css'
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import Login from './Login' // Importa a tela de login
+import CategoryManager from './CategoryManager';
 
 function App() {
   // Estado para saber se está logado (verifica se tem token salvo)
@@ -26,6 +27,8 @@ function App() {
     category: '', // Aqui vai o ID da categoria
     type: 'OUT'   // Valor padrão: Saída
   })
+
+  const [showCategoryManager, setShowCategoryManager] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -239,6 +242,28 @@ function App() {
           {'>'}
         </button>
       </div>
+
+      {/* Botão para abrir Gerenciador de Categorias */}
+      <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+        <button 
+            onClick={() => setShowCategoryManager(!showCategoryManager)}
+            style={{ 
+                background: '#6c757d', color: 'white', border: 'none', 
+                padding: '5px 15px', borderRadius: '15px', cursor: 'pointer', fontSize: '12px' 
+            }}
+        >
+            {showCategoryManager ? 'Fechar Gerenciador' : '⚙️ Gerenciar Categorias'}
+        </button>
+      </div>
+
+      {/* Renderiza o componente SE o estado for true */}
+      {showCategoryManager && (
+          <CategoryManager 
+              categories={categories} 
+              onUpdate={fetchCategories} // Passamos a função para atualizar a lista original
+              onClose={() => setShowCategoryManager(false)}
+          />
+      )}
 
       {/* --- DASHBOARD (RESUMO) --- */}
       <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
