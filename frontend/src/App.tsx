@@ -15,6 +15,8 @@ function App() {
   // null = modo de criação
   // objeto transação = modo de edição
   const [editingTransaction, setEditingTransaction] = useState(null)
+  // Inicia com a data de hoje
+  const [currentDate, setCurrentDate] = useState(new Date())
 
   // Estado para guardar os dados do formulário
   const [formData, setFormData] = useState({
@@ -25,17 +27,21 @@ function App() {
     type: 'OUT'   // Valor padrão: Saída
   })
 
-  // Mova o useEffect para rodar APENAS se estiver autenticado
   useEffect(() => {
     if (isAuthenticated) {
       fetchTransactions()
       fetchCategories()
     }
-  }, [isAuthenticated]) // Roda quando isAuthenticated mudar
+    // Adicione 'currentDate' aqui no array de dependências
+  }, [isAuthenticated, currentDate])
 
   const fetchTransactions = async () => {
     try {
-      const response = await api.get('transactions/')
+      const year = currentDate.getFullYear()
+      const month = currentDate.getMonth() + 1 // Janeiro é 0, logo +1
+      
+      // Enviamos os parâmetros na URL
+      const response = await api.get(`transactions/?month=${month}&year=${year}`)
       setTransactions(response.data)
     } catch (error) {
       console.error("Erro ao buscar transações:", error)
@@ -130,6 +136,20 @@ function App() {
     setTransactions([]);
   }
 
+  // Função para ir para o mês anterior
+  const prevMonth = () => {
+    const newDate = new Date(currentDate)
+    newDate.setMonth(newDate.getMonth() - 1)
+    setCurrentDate(newDate)
+  }
+
+  // Função para ir para o próximo mês
+  const nextMonth = () => {
+    const newDate = new Date(currentDate)
+    newDate.setMonth(newDate.getMonth() + 1)
+    setCurrentDate(newDate)
+  }
+
   // --- CÁLCULOS DO DASHBOARD ---
 
   // 1. Filtra só as entradas e soma os valores
@@ -201,6 +221,22 @@ function App() {
           }}
         >
           Sair 🚪
+        </button>
+      </div>
+
+      {/* --- NAVEGAÇÃO DE MESES --- */}
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '20px', marginBottom: '20px' }}>
+        <button onClick={prevMonth} style={{ background: 'none', border: '1px solid #ccc', borderRadius: '50%', width: '30px', height: '30px', cursor: 'pointer' }}>
+          {'<'}
+        </button>
+        
+        <h2 style={{ margin: 0, textTransform: 'capitalize' }}>
+          {/* Formata a data para português (ex: "Janeiro 2024") */}
+          {currentDate.toLocaleDateString('pt-PT', { month: 'long', year: 'numeric' })}
+        </h2>
+
+        <button onClick={nextMonth} style={{ background: 'none', border: '1px solid #ccc', borderRadius: '50%', width: '30px', height: '30px', cursor: 'pointer' }}>
+          {'>'}
         </button>
       </div>
 

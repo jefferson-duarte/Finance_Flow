@@ -28,7 +28,15 @@ class TransactionViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        return Transaction.objects.filter(user=self.request.user)
+        queryset = Transaction.objects.filter(user=self.request.user)
+
+        month = self.request.query_params.get('month')
+        year = self.request.query_params.get('year')
+
+        if month and year:
+            queryset = queryset.filter(date__month=month, date__year=year)
+
+        return queryset
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
