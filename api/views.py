@@ -49,6 +49,14 @@ class TransactionViewSet(viewsets.ModelViewSet):
         serializer.save(user=self.request.user)
 
 
+class ProfileView(generics.RetrieveUpdateAPIView):
+    serializer_class = UserSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user
+
+
 # --- ADICIONE ESTA NOVA CLASSE NO FINAL ---
 class ExportPDFView(generics.GenericAPIView):
     # Essa view não precisa de Serializer, pois gera um arquivo

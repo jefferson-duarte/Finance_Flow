@@ -297,220 +297,208 @@ function App() {
       {/* --- CONTEÚDO PRINCIPAL (DIREITA) --- */}
       <main className="main-content">
         
-        {/* SE FOR DASHBOARD, MOSTRA TUDO ISSO: */}
-        {currentView === 'dashboard' && (
-        <>
-          {/* Cabeçalho com Data */}
-          <div className="content-header">
-            <h2 style={{ margin: 0 }}>Visão Geral</h2>
+        {/* Cabeçalho com Data */}
+        <div className="content-header">
+          <h2 style={{ margin: 0 }}>Visão Geral</h2>
+          
+          {/* Navegação de Data Turbinada */}
+          <div className="date-nav">
             
-            {/* Navegação de Data Turbinada */}
-            <div className="date-nav">
-              
-              {/* Botão HOJE */}
-              <button 
-                  onClick={goToToday} 
-                  title="Voltar para Hoje"
-                  style={{ fontSize: '0.8rem', marginRight: '10px', background: '#e5e7eb', padding: '5px 10px', borderRadius: '5px' }}
-              >
-                  Hoje
-              </button>
+            {/* Botão HOJE */}
+            <button 
+                onClick={goToToday} 
+                title="Voltar para Hoje"
+                style={{ fontSize: '0.8rem', marginRight: '10px', background: '#e5e7eb', padding: '5px 10px', borderRadius: '5px' }}
+            >
+                Hoje
+            </button>
 
-              <button onClick={prevMonth}>{'<'}</button>
-              
-              {/* Aqui está o truque: O Input de data substitui o texto estático */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                  <span style={{ fontWeight: 'bold', minWidth: '140px', textAlign: 'center' }}>
-                      {currentDate.toLocaleDateString('pt-PT', { month: 'long', year: 'numeric' })}
-                  </span>
-                  
-                  {/* Ícone de calendário que abre o seletor */}
-                  <input 
-                      type="date" 
-                      value={formatDateForInput(currentDate)}
-                      onChange={handleDateChange}
-                      style={{ 
-                          width: '25px', 
-                          height: '25px', 
-                          border: 'none', 
-                          background: 'transparent', 
-                          cursor: 'pointer',
-                          padding: 0
-                      }}
-                      title="Escolher data específica"
-                  />
+            <button onClick={prevMonth}>{'<'}</button>
+            
+            {/* Aqui está o truque: O Input de data substitui o texto estático */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <span style={{ fontWeight: 'bold', minWidth: '140px', textAlign: 'center' }}>
+                    {currentDate.toLocaleDateString('pt-PT', { month: 'long', year: 'numeric' })}
+                </span>
+                
+                {/* Ícone de calendário que abre o seletor */}
+                <input 
+                    type="date" 
+                    value={formatDateForInput(currentDate)}
+                    onChange={handleDateChange}
+                    style={{ 
+                        width: '25px', 
+                        height: '25px', 
+                        border: 'none', 
+                        background: 'transparent', 
+                        cursor: 'pointer',
+                        padding: 0
+                    }}
+                    title="Escolher data específica"
+                />
+            </div>
+
+            <button onClick={nextMonth}>{'>'}</button>
+          </div>
+        </div>
+
+        {/* Gerenciador de Categorias (Modal/Overlay) */}
+        {showCategoryManager && (
+          <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 }}>
+             <CategoryManager 
+                categories={categories} 
+                onUpdate={fetchCategories} 
+                onClose={() => setShowCategoryManager(false)}
+             />
+          </div>
+        )}
+
+        {/* 1. CARDS DE RESUMO */}
+        <div className="stats-grid">
+          <div className="stat-card" style={{ borderLeft: '4px solid #10b981' }}>
+            <h3>Receitas</h3>
+            <p style={{ color: '#10b981' }}>R$ {income.toFixed(2)}</p>
+          </div>
+          <div className="stat-card" style={{ borderLeft: '4px solid #ef4444' }}>
+            <h3>Despesas</h3>
+            <p style={{ color: '#ef4444' }}>R$ {expense.toFixed(2)}</p>
+          </div>
+          <div className="stat-card" style={{ borderLeft: '4px solid #4f46e5' }}>
+            <h3>Saldo</h3>
+            <p style={{ color: balance >= 0 ? '#4f46e5' : '#ef4444' }}>R$ {balance.toFixed(2)}</p>
+          </div>
+        </div>
+
+        {/* 2. LINHA DO MEIO: FORMULÁRIO + GRÁFICO (LADO A LADO) */}
+        <div className="row-container">
+          
+          {/* Formulário (Lado Esquerdo) */}
+          <div className="card-box">
+            <h3 style={{ marginTop: 0 }}>{editingTransaction ? 'Editar Lançamento' : 'Novo Lançamento'}</h3>
+            <form onSubmit={handleSubmit}>
+              <div className="form-group">
+                <label>Descrição</label>
+                <input type="text" name="description" value={formData.description} onChange={handleInputChange} required placeholder="Ex: Conta de Luz" />
               </div>
 
-              <button onClick={nextMonth}>{'>'}</button>
-            </div>
+              <div className="form-row">
+                <div>
+                  <label>Valor</label>
+                  <input type="number" name="amount" value={formData.amount} onChange={handleInputChange} required placeholder="0.00" />
+                </div>
+                <div>
+                  <label>Data</label>
+                  <input type="date" name="date" value={formData.date} onChange={handleInputChange} required />
+                </div>
+              </div>
+
+              <div className="form-row">
+                <div>
+                  <label>Categoria</label>
+                  <select name="category" value={formData.category} onChange={handleInputChange}>
+                    {categories.map(cat => (
+                      <option key={cat.id} value={cat.id}>{cat.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label>Tipo</label>
+                  <select name="type" value={formData.type} onChange={handleInputChange}>
+                    <option value="IN">Entrada</option>
+                    <option value="OUT">Saída</option>
+                  </select>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+                <button type="submit" className="btn-primary" style={{ background: editingTransaction ? '#f59e0b' : '' }}>
+                    {editingTransaction ? 'Salvar Alterações' : 'Adicionar Lançamento'}
+                </button>
+                {editingTransaction && (
+                    <button type="button" onClick={() => {setEditingTransaction(null); setFormData({description:'', amount:'', date:getTodayDate(), category: categories[0]?.id, type:'OUT'})}} className="btn-primary" style={{ background: '#9ca3af' }}>
+                        Cancelar
+                    </button>
+                )}
+              </div>
+            </form>
           </div>
 
-          {/* Gerenciador de Categorias (Modal/Overlay) */}
-          {showCategoryManager && (
-            <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 }}>
-              <CategoryManager 
-                  categories={categories} 
-                  onUpdate={fetchCategories} 
-                  onClose={() => setShowCategoryManager(false)}
-              />
-            </div>
-          )}
-
-          {/* 1. CARDS DE RESUMO */}
-          <div className="stats-grid">
-            <div className="stat-card" style={{ borderLeft: '4px solid #10b981' }}>
-              <h3>Receitas</h3>
-              <p style={{ color: '#10b981' }}>R$ {income.toFixed(2)}</p>
-            </div>
-            <div className="stat-card" style={{ borderLeft: '4px solid #ef4444' }}>
-              <h3>Despesas</h3>
-              <p style={{ color: '#ef4444' }}>R$ {expense.toFixed(2)}</p>
-            </div>
-            <div className="stat-card" style={{ borderLeft: '4px solid #4f46e5' }}>
-              <h3>Saldo</h3>
-              <p style={{ color: balance >= 0 ? '#4f46e5' : '#ef4444' }}>R$ {balance.toFixed(2)}</p>
-            </div>
-          </div>
-
-          {/* 2. LINHA DO MEIO: FORMULÁRIO + GRÁFICO (LADO A LADO) */}
-          <div className="row-container">
-            
-            {/* Formulário (Lado Esquerdo) */}
-            <div className="card-box">
-              <h3 style={{ marginTop: 0 }}>{editingTransaction ? 'Editar Lançamento' : 'Novo Lançamento'}</h3>
-              <form onSubmit={handleSubmit}>
-                <div className="form-group">
-                  <label>Descrição</label>
-                  <input type="text" name="description" value={formData.description} onChange={handleInputChange} required placeholder="Ex: Conta de Luz" />
-                </div>
-
-                <div className="form-row">
-                  <div>
-                    <label>Valor</label>
-                    <input type="number" name="amount" value={formData.amount} onChange={handleInputChange} required placeholder="0.00" />
-                  </div>
-                  <div>
-                    <label>Data</label>
-                    <input type="date" name="date" value={formData.date} onChange={handleInputChange} required />
-                  </div>
-                </div>
-
-                <div className="form-row">
-                  <div>
-                    <label>Categoria</label>
-                    <select name="category" value={formData.category} onChange={handleInputChange}>
-                      {categories.map(cat => (
-                        <option key={cat.id} value={cat.id}>{cat.name}</option>
+          {/* Gráfico (Lado Direito) */}
+          <div className="card-box" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+            <h3 style={{ marginTop: 0, marginBottom: '20px' }}>Gastos por Categoria</h3>
+            {expensesByCategory.length > 0 ? (
+              <div style={{ width: '100%', height: '250px' }}>
+                <ResponsiveContainer>
+                  <PieChart>
+                    <Pie data={expensesByCategory} dataKey="value" innerRadius={60} outerRadius={80} fill="#8884d8" paddingAngle={5}>
+                      {expensesByCategory.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label>Tipo</label>
-                    <select name="type" value={formData.type} onChange={handleInputChange}>
-                      <option value="IN">Entrada</option>
-                      <option value="OUT">Saída</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
-                  <button type="submit" className="btn-primary" style={{ background: editingTransaction ? '#f59e0b' : '' }}>
-                      {editingTransaction ? 'Salvar Alterações' : 'Adicionar Lançamento'}
-                  </button>
-                  {editingTransaction && (
-                      <button type="button" onClick={() => {setEditingTransaction(null); setFormData({description:'', amount:'', date:getTodayDate(), category: categories[0]?.id, type:'OUT'})}} className="btn-primary" style={{ background: '#9ca3af' }}>
-                          Cancelar
-                      </button>
-                  )}
-                </div>
-              </form>
-            </div>
-
-            {/* Gráfico (Lado Direito) */}
-            <div className="card-box" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-              <h3 style={{ marginTop: 0, marginBottom: '20px' }}>Gastos por Categoria</h3>
-              {expensesByCategory.length > 0 ? (
-                <div style={{ width: '100%', height: '250px' }}>
-                  <ResponsiveContainer>
-                    <PieChart>
-                      <Pie data={expensesByCategory} dataKey="value" innerRadius={60} outerRadius={80} fill="#8884d8" paddingAngle={5}>
-                        {expensesByCategory.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                        ))}
-                      </Pie>
-                      <Tooltip formatter={(value) => `R$ ${value.toFixed(2)}`} />
-                      <Legend />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
-              ) : (
-                <p style={{ color: '#9ca3af' }}>Sem dados para exibir.</p>
-              )}
-            </div>
-
+                    </Pie>
+                    <Tooltip formatter={(value) => `R$ ${value.toFixed(2)}`} />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            ) : (
+              <p style={{ color: '#9ca3af' }}>Sem dados para exibir.</p>
+            )}
           </div>
 
-          {/* 3. LISTA DE TRANSAÇÕES */}
-          <div className="transaction-list">
-            {/* Cabeçalho da Lista com Botão PDF */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px', borderBottom: '1px solid #eee', paddingBottom: '10px' }}>
-              <h3 style={{ margin: 0 }}>Histórico Recente</h3>
-              
-              <button 
-                onClick={handleExportPDF}
-                style={{ 
-                  background: '#4b5563', 
-                  color: 'white', 
-                  border: 'none', 
-                  padding: '5px 12px', 
-                  borderRadius: '5px', 
-                  cursor: 'pointer', 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  gap: '5px',
-                  fontSize: '0.9rem'
-                }}
-              >
-                📄 Baixar PDF
-              </button>
-            </div>
+        </div>
 
-            {/* Nova DIV que contem apenas os itens e tem o scroll */}
-            <div className="list-content">
-              
-              {transactions.map((transaction) => (
-                <div key={transaction.id} className="transaction-item">
-                  <div>
-                    <strong style={{ display: 'block', fontSize: '1.1rem' }}>{transaction.description}</strong>
-                    <small style={{ color: '#6b7280' }}>{transaction.date} • {transaction.category_name}</small>
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                    <span style={{ fontWeight: 'bold', color: transaction.type === 'IN' ? '#10b981' : '#ef4444' }}>
-                      {transaction.type === 'IN' ? '+' : '-'} R$ {transaction.amount}
-                    </span>
-                    <button onClick={() => handleEdit(transaction)} style={{ border: 'none', background: 'none', cursor: 'pointer' }}>✏️</button>
-                    <button onClick={() => handleDelete(transaction.id)} style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#ef4444' }}>🗑️</button>
-                  </div>
-                </div>
-              ))}
-
-              {transactions.length === 0 && (
-                <p style={{ textAlign: 'center', color: '#9ca3af', padding: '20px' }}>
-                  Nenhum lançamento neste mês.
-                </p>
-              )}
-              
-            </div>
+        {/* 3. LISTA DE TRANSAÇÕES */}
+        <div className="transaction-list">
+          {/* Cabeçalho da Lista com Botão PDF */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px', borderBottom: '1px solid #eee', paddingBottom: '10px' }}>
+            <h3 style={{ margin: 0 }}>Histórico Recente</h3>
+            
+            <button 
+              onClick={handleExportPDF}
+              style={{ 
+                background: '#4b5563', 
+                color: 'white', 
+                border: 'none', 
+                padding: '5px 12px', 
+                borderRadius: '5px', 
+                cursor: 'pointer', 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '5px',
+                fontSize: '0.9rem'
+              }}
+            >
+              📄 Baixar PDF
+            </button>
           </div>
-        </>
-        )}
 
-        {/* SE FOR PERFIL, MOSTRA SÓ ISSO: */}
-        {currentView === 'profile' && (
-            <div style={{ display: 'flex', justifyContent: 'center', paddingTop: '50px' }}>
-                <Profile />
-            </div>
-        )}
+          {/* Nova DIV que contem apenas os itens e tem o scroll */}
+          <div className="list-content">
+            
+            {transactions.map((transaction) => (
+              <div key={transaction.id} className="transaction-item">
+                <div>
+                  <strong style={{ display: 'block', fontSize: '1.1rem' }}>{transaction.description}</strong>
+                  <small style={{ color: '#6b7280' }}>{transaction.date} • {transaction.category_name}</small>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                  <span style={{ fontWeight: 'bold', color: transaction.type === 'IN' ? '#10b981' : '#ef4444' }}>
+                    {transaction.type === 'IN' ? '+' : '-'} R$ {transaction.amount}
+                  </span>
+                  <button onClick={() => handleEdit(transaction)} style={{ border: 'none', background: 'none', cursor: 'pointer' }}>✏️</button>
+                  <button onClick={() => handleDelete(transaction.id)} style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#ef4444' }}>🗑️</button>
+                </div>
+              </div>
+            ))}
+
+            {transactions.length === 0 && (
+              <p style={{ textAlign: 'center', color: '#9ca3af', padding: '20px' }}>
+                Nenhum lançamento neste mês.
+              </p>
+            )}
+            
+          </div>
+        </div>
 
       </main>
     </div>
