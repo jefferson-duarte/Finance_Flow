@@ -114,15 +114,35 @@ body {
   margin-bottom: 30px;
 }
 
-/* Navegação de Data */
+/* Ajuste na navegação */
 .date-nav {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 10px;
+  /* Reduzi um pouco o gap */
   background: white;
-  padding: 8px 16px;
+  padding: 5px 15px;
+  /* Mais compacto */
   border-radius: 20px;
   box-shadow: var(--shadow);
+}
+
+/* Remove a borda feia do input de data na navegação */
+.date-nav input[type="date"] {
+  border: none;
+  background: #f3f4f6;
+  border-radius: 4px;
+  width: auto;
+  margin: 0;
+  padding: 2px;
+}
+
+/* No celular, ajusta para caber tudo */
+@media (max-width: 600px) {
+  .date-nav {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
 }
 
 .date-nav button {

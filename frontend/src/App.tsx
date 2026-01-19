@@ -11,6 +11,14 @@ function App() {
     !!localStorage.getItem("access_token")
   );
 
+  const getTodayDate = () => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0'); // Adiciona zero à esquerda (01, 02...)
+    const day = String(today.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   const [transactions, setTransactions] = useState([])
   const [categories, setCategories] = useState([]) // Novo estado para categorias
   // null = modo de criação
@@ -23,7 +31,7 @@ function App() {
   const [formData, setFormData] = useState({
     description: '',
     amount: '',
-    date: '',
+    date: getTodayDate(),
     category: '', // Aqui vai o ID da categoria
     type: 'OUT'   // Valor padrão: Saída
   })
@@ -99,7 +107,8 @@ function App() {
       fetchTransactions() // Atualiza a lista
 
       // Limpa o formulário
-      setFormData({ description: '', amount: '', date: '', category: categories[0]?.id || '', type: 'OUT' })
+      setFormData({ description: '', amount: '', date: getTodayDate(), category: formData.category, type: 'OUT' })
+
 
     } catch (error) {
       console.error("Erro ao salvar:", error)
@@ -151,6 +160,30 @@ function App() {
     const newDate = new Date(currentDate)
     newDate.setMonth(newDate.getMonth() + 1)
     setCurrentDate(newDate)
+  }
+
+  // 1. Botão para voltar para o mês atual
+  const goToToday = () => {
+    setCurrentDate(new Date());
+  }
+
+  // 2. Quando o usuário escolhe uma data específica no calendário
+  const handleDateChange = (e) => {
+    const dateValue = e.target.value; // Vem no formato "YYYY-MM-DD"
+    if (dateValue) {
+      // Precisamos corrigir o fuso horário para não cair no dia anterior
+      const [year, month, day] = dateValue.split('-');
+      const newDate = new Date(year, month - 1, day);
+      setCurrentDate(newDate);
+    }
+  }
+
+  // Função auxiliar para formatar a data atual para o input (YYYY-MM-DD)
+  const formatDateForInput = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
 
   // --- CÁLCULOS DO DASHBOARD ---
@@ -231,9 +264,43 @@ function App() {
         <div className="content-header">
           <h2 style={{ margin: 0 }}>Visão Geral</h2>
           
+          {/* Navegação de Data Turbinada */}
           <div className="date-nav">
+            
+            {/* Botão HOJE */}
+            <button 
+                onClick={goToToday} 
+                title="Voltar para Hoje"
+                style={{ fontSize: '0.8rem', marginRight: '10px', background: '#e5e7eb', padding: '5px 10px', borderRadius: '5px' }}
+            >
+                Hoje
+            </button>
+
             <button onClick={prevMonth}>{'<'}</button>
-            <span>{currentDate.toLocaleDateString('pt-PT', { month: 'long', year: 'numeric' })}</span>
+            
+            {/* Aqui está o truque: O Input de data substitui o texto estático */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <span style={{ fontWeight: 'bold', minWidth: '140px', textAlign: 'center' }}>
+                    {currentDate.toLocaleDateString('pt-PT', { month: 'long', year: 'numeric' })}
+                </span>
+                
+                {/* Ícone de calendário que abre o seletor */}
+                <input 
+                    type="date" 
+                    value={formatDateForInput(currentDate)}
+                    onChange={handleDateChange}
+                    style={{ 
+                        width: '25px', 
+                        height: '25px', 
+                        border: 'none', 
+                        background: 'transparent', 
+                        cursor: 'pointer',
+                        padding: 0
+                    }}
+                    title="Escolher data específica"
+                />
+            </div>
+
             <button onClick={nextMonth}>{'>'}</button>
           </div>
         </div>
@@ -311,7 +378,7 @@ function App() {
                     {editingTransaction ? 'Salvar Alterações' : 'Adicionar Lançamento'}
                 </button>
                 {editingTransaction && (
-                    <button type="button" onClick={() => {setEditingTransaction(null); setFormData({description:'', amount:'', date:'', category: categories[0]?.id, type:'OUT'})}} className="btn-primary" style={{ background: '#9ca3af' }}>
+                    <button type="button" onClick={() => {setEditingTransaction(null); setFormData({description:'', amount:'', date:getTodayDate(), category: categories[0]?.id, type:'OUT'})}} className="btn-primary" style={{ background: '#9ca3af' }}>
                         Cancelar
                     </button>
                 )}
