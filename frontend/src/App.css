@@ -306,3 +306,182 @@ select {
     overflow: auto;
   }
 }
+
+/* --- TELA DE LOGIN (Split Screen) --- */
+.login-container {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  background-color: #f3f4f6;
+}
+
+/* Lado Esquerdo (Formulário) */
+.login-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  background: white;
+}
+
+.login-content {
+  width: 100%;
+  max-width: 400px;
+  /* Largura máxima do formulário */
+}
+
+.login-header {
+  margin-bottom: 40px;
+}
+
+.login-header h1 {
+  font-size: 2rem;
+  color: var(--primary);
+  margin: 0 0 10px 0;
+}
+
+.login-header p {
+  color: var(--sidebar-text);
+  margin: 0;
+}
+
+/* Estilização dos Inputs do Login */
+.login-input-group {
+  margin-bottom: 20px;
+}
+
+.login-input-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.login-input-group input {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 1rem;
+  background-color: #f9fafb;
+  transition: 0.3s;
+}
+
+.login-input-group input:focus {
+  border-color: var(--primary);
+  background-color: #fff;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+/* Botão de Entrar */
+.btn-login {
+  width: 100%;
+  padding: 14px;
+  /* Cor de fundo fixa (Roxo) para garantir que apareça */
+  background-color: #4f46e5;
+  /* Gradiente opcional (se o navegador aceitar) */
+  background-image: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+
+  /* Cor do texto: Branco com !important para forçar a visibilidade */
+  color: #ffffff !important;
+
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s;
+  box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.3);
+}
+
+.btn-login:hover {
+  background-color: #4338ca;
+  /* Roxo mais escuro no mouse over */
+  transform: translateY(-2px);
+}
+
+/* Link de alternar (Login/Cadastro) */
+.toggle-text {
+  text-align: center;
+  margin-top: 25px;
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.toggle-text span {
+  color: var(--primary);
+  font-weight: bold;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.toggle-text span:hover {
+  text-decoration: underline;
+}
+
+/* Lado Direito (Gradiente Decorativo) */
+.login-right {
+  flex: 1.5;
+  /* Ocupa um pouco mais da metade */
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Decoração simples no lado direito (Círculos) */
+.login-right::before {
+  content: '';
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  top: -50px;
+  right: -50px;
+}
+
+.login-right::after {
+  content: '';
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 50%;
+  bottom: 50px;
+  left: 50px;
+}
+
+/* Mensagem no lado direito */
+.banner-text {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+  padding: 40px;
+}
+
+.banner-text h2 {
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+}
+
+.banner-text p {
+  font-size: 1.2rem;
+  opacity: 0.9;
+  max-width: 400px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* Mobile: Esconde o lado direito */
+@media (max-width: 800px) {
+  .login-right {
+    display: none;
+  }
+}
