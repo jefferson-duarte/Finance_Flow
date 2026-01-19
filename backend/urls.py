@@ -4,7 +4,8 @@ from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import (TokenObtainPairView,
                                             TokenRefreshView)
 
-from api.views import CategoryViewSet, RegisterView, TransactionViewSet
+from api.views import (CategoryViewSet, ExportPDFView, RegisterView,
+                       TransactionViewSet)
 
 router = DefaultRouter()
 
@@ -17,6 +18,7 @@ urlpatterns = [
     path('api/', include(router.urls)),
 
     path('api/register/', RegisterView.as_view(), name='register'),
+    path('api/export-pdf/', ExportPDFView.as_view(), name='export-pdf'),
 
     # --- ROTAS DE AUTENTICAÇÃO ---
     path(

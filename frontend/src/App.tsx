@@ -222,6 +222,31 @@ function App() {
       return acc;
     }, []);
 
+    // Função para baixar o PDF
+  const handleExportPDF = async () => {
+    try {
+      const year = currentDate.getFullYear();
+      const month = currentDate.getMonth() + 1;
+
+      // Importante: responseType: 'blob' diz ao axios que virá um arquivo, não um JSON
+      const response = await api.get(`export-pdf/?month=${month}&year=${year}`, {
+        responseType: 'blob' 
+      });
+
+      // Truque do navegador para baixar arquivos via AJAX
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `Extrato_${month}-${year}.pdf`); // Nome do arquivo
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (error) {
+      console.error("Erro ao baixar PDF", error);
+      alert("Erro ao gerar o PDF.");
+    }
+  };
+
   // --- RENDERIZAÇÃO CONDICIONAL ---
 
   /// ... (Mantenha toda a lógica JS, imports, useEffects, etc.)
@@ -412,10 +437,28 @@ function App() {
 
         {/* 3. LISTA DE TRANSAÇÕES */}
         <div className="transaction-list">
-          {/* Título fica FORA da área de scroll */}
-          <h3 style={{ marginTop: 0, marginBottom: '15px', borderBottom: '1px solid #eee', paddingBottom: '10px' }}>
-            Histórico Recente
-          </h3>
+          {/* Cabeçalho da Lista com Botão PDF */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px', borderBottom: '1px solid #eee', paddingBottom: '10px' }}>
+            <h3 style={{ margin: 0 }}>Histórico Recente</h3>
+            
+            <button 
+              onClick={handleExportPDF}
+              style={{ 
+                background: '#4b5563', 
+                color: 'white', 
+                border: 'none', 
+                padding: '5px 12px', 
+                borderRadius: '5px', 
+                cursor: 'pointer', 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '5px',
+                fontSize: '0.9rem'
+              }}
+            >
+              📄 Baixar PDF
+            </button>
+          </div>
 
           {/* Nova DIV que contem apenas os itens e tem o scroll */}
           <div className="list-content">
