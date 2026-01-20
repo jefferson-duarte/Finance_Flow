@@ -1,9 +1,12 @@
+import { useLanguage } from '../LanguageContext';
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 function ExpensesChart({ data, colors }) {
+  const { t } = useLanguage();
+
   return (
     <div className="card-box" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-      <h3 style={{ marginTop: 0, marginBottom: '20px' }}>Gastos por Categoria</h3>
+      <h3 style={{ marginTop: 0, marginBottom: '20px' }}>{t.chart_title}</h3>
       {data.length > 0 ? (
         <div style={{ width: '100%', height: '250px' }}>
           <ResponsiveContainer>
@@ -13,13 +16,13 @@ function ExpensesChart({ data, colors }) {
                   <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
                 ))}
               </Pie>
-              <Tooltip formatter={(value) => `R$ ${value.toFixed(2)}`} />
+              <Tooltip formatter={(value) => `${t.currency_symbol} ${value.toFixed(2)}`} />
               <Legend />
             </PieChart>
           </ResponsiveContainer>
         </div>
       ) : (
-        <p style={{ color: '#9ca3af' }}>Sem dados para exibir.</p>
+        <p style={{ color: '#9ca3af' }}>{t.no_data}</p>
       )}
     </div>
   );

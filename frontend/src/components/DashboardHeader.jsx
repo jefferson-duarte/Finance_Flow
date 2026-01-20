@@ -1,4 +1,7 @@
+import { useLanguage } from '../LanguageContext';
+
 function DashboardHeader({ currentDate, onPrevMonth, onNextMonth, onGoToToday, onDateChange }) {
+  const { t } = useLanguage();
 
   // Função auxiliar para formatar data para o input date
   const formatDateForInput = (date) => {
@@ -10,15 +13,15 @@ function DashboardHeader({ currentDate, onPrevMonth, onNextMonth, onGoToToday, o
 
   return (
     <div className="content-header">
-      <h2 style={{ margin: 0 }}>Visão Geral</h2>
+      <h2 style={{ margin: 0 }}>{t.header_overview}</h2>
 
       <div className="date-nav">
         <button
           onClick={onGoToToday}
-          title="Voltar para Hoje"
+          title={t.title_today}
           style={{ fontSize: '0.8rem', marginRight: '10px', background: '#e5e7eb', padding: '5px 10px', borderRadius: '5px' }}
         >
-          Hoje
+          {t.btn_today}
         </button>
 
         <button onClick={onPrevMonth}>{'<'}</button>

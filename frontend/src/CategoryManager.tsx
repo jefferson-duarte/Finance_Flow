@@ -1,8 +1,12 @@
 import { useState } from 'react';
 import api from './api';
 
+import { useLanguage } from './LanguageContext';
+
+
 function CategoryManager({ categories, onUpdate, onClose }) {
   const [newCategory, setNewCategory] = useState('');
+  const { t } = useLanguage();
 
   // --- CRIAR ---
   const handleAdd = async (e) => {
@@ -51,7 +55,7 @@ function CategoryManager({ categories, onUpdate, onClose }) {
       borderRadius: '8px', marginBottom: '20px', boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
     }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h3>Gerenciar Categorias</h3>
+        <h3>{t.category_title}</h3>
         <button onClick={onClose} style={{ background: 'transparent', border: 'none', fontSize: '16px', cursor: 'pointer' }}>❌</button>
       </div>
 
@@ -61,7 +65,7 @@ function CategoryManager({ categories, onUpdate, onClose }) {
           type="text"
           value={newCategory}
           onChange={(e) => setNewCategory(e.target.value)}
-          placeholder="Nova Categoria..."
+          placeholder={t.placeholder_categoy}
           style={{ flex: 1, padding: '8px' }}
         />
         <button type="submit" style={{ background: '#28a745', color: 'white', border: 'none', padding: '8px 15px', borderRadius: '4px', cursor: 'pointer' }}>

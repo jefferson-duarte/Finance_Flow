@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react';
 import api from './api';
+import { useLanguage } from './LanguageContext';
 
 function Profile() {
+  const { t } = useLanguage();
+
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -49,12 +52,12 @@ function Profile() {
 
   return (
     <div style={{ maxWidth: '600px', background: 'white', padding: '30px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
-      <h2 style={{ marginTop: 0, color: '#4f46e5' }}>Meu Perfil</h2>
-      <p style={{ color: '#6b7280', marginBottom: '20px' }}>Atualize suas informações pessoais.</p>
+      <h2 style={{ marginTop: 0, color: '#4f46e5' }}>{t.profile_title}</h2>
+      <p style={{ color: '#6b7280', marginBottom: '20px' }}>{t.profile_subtitle}</p>
 
       <form onSubmit={handleSave}>
         <div style={{ marginBottom: '15px' }}>
-          <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '5px' }}>Nome de Usuário</label>
+          <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '5px' }}>{t.label_username}</label>
           <input
             type="text"
             value={formData.username}
@@ -64,7 +67,7 @@ function Profile() {
         </div>
 
         <div style={{ marginBottom: '15px' }}>
-          <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '5px' }}>Email</label>
+          <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '5px' }}>{t.label_email}</label>
           <input
             type="email"
             value={formData.email}
@@ -74,15 +77,15 @@ function Profile() {
         </div>
 
         <div style={{ marginBottom: '25px' }}>
-          <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '5px' }}>Nova Senha</label>
+          <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '5px' }}>{t.label_password}</label>
           <input
             type="password"
-            placeholder="Deixe em branco para manter a atual"
+            placeholder={t.placeholder_password}
             value={formData.password}
             onChange={e => setFormData({ ...formData, password: e.target.value })}
             style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #d1d5db', background: '#f9fafb' }}
           />
-          <small style={{ color: '#6b7280' }}>Só preencha se quiser alterar sua senha.</small>
+          <small style={{ color: '#6b7280' }}>{t.helper_password}</small>
         </div>
 
         <button
@@ -92,7 +95,7 @@ function Profile() {
             border: 'none', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer'
           }}
         >
-          Salvar Alterações
+          {t.btn_save_profile}
         </button>
       </form>
     </div>
