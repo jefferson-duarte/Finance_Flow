@@ -10,34 +10,45 @@
 - **SQLite**: Database (Development environment).
 - **JWT (JSON Web Tokens)**: Secure authentication.
 - **Django Signals**: Automated logic for new user setup.
+- **ReportLab**: Library for generating PDF financial statements.
 
 ### Frontend (User Interface)
 - **React.js** (via Vite): Component-based UI.
 - **Axios**: HTTP client for API requests.
 - **Recharts**: Data visualization library.
-- **CSS Modules**: Styling.
+- **CSS Modules & Flexbox**: Custom professional styling with Sidebar layout.
 
 ---
 
 ## ✨ Key Features
 
-- **Secure Authentication:**
-  - User Registration and Login using JWT.
-  - Route protection (private access only).
+- **✅ Secure Authentication:**
+  - Split-screen Login and Registration pages with modern UI.
+  - JWT-based session management.
   - Data isolation (Users can only see their own data).
 
-- **Financial Dashboard:**
-  - Real-time summary of Income, Expenses, and Current Balance.
-  - Interactive Pie Chart (Expenses by Category).
-  - **Date Filtering:** Navigation by Month/Year to track historical data.
+- **📊 Financial Dashboard:**
+  - **Real-time Overview:** Summary of Income, Expenses, and Current Balance.
+  - **Visualizations:** Interactive Pie Chart (Expenses by Category).
+  - **Smart Navigation:** - Jump to "Today" with one click.
+    - Custom Date Picker to view historical data.
+    - Month/Year filters.
 
-- **Transaction Management (CRUD):**
-  - Create, Read, Update, and Delete transactions.
+- **💸 Transaction Management:**
+  - CRUD operations (Create, Read, Update, Delete).
   - Visual indicators for Incomes (Green) and Expenses (Red).
+  - Internal scrolling for transaction lists (keeps the UI clean).
 
-- **Category Management:**
-  - **Automation:** New users automatically receive a default set of categories (via Django Signals).
+- **📂 Category Management:**
+  - **Automation:** New users automatically receive a default set of categories.
   - **Customization:** Users can create, rename, and delete their own categories.
+
+- **👤 User Profile:**
+  - Update personal information (Username, Email).
+  - Secure Password Change functionality.
+
+- **📄 Reporting:**
+  - **PDF Export:** Generate professional monthly financial statements with a single click.
 
 ---
 
@@ -53,8 +64,7 @@ Here is the progress of the project development:
 - [x] **Phase 6:** JWT Authentication & User Data Security.
 - [x] **Phase 7:** Automation with Signals (Default Categories).
 - [x] **Phase 8:** Date Filters & Category Manager.
-
-
+- [x] **Phase 9:** UI/UX Makeover (Sidebar, Modern Design, PDF Export, Profile).
 ---
 
 ## 🔧 How to Run the Project
@@ -76,7 +86,7 @@ python -m venv venv
 # Linux/Mac:
 source venv/bin/activate
 
-# Install dependencies
+# Install dependencies (including ReportLab)
 pip install -r requirements.txt
 
 # Run database migrations

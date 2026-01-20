@@ -1,0 +1,36 @@
+function TransactionList({ transactions, onEdit, onDelete, onExportPDF }) {
+  return (
+    <div className="transaction-list">
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px', borderBottom: '1px solid #eee', paddingBottom: '10px' }}>
+        <h3 style={{ margin: 0 }}>Histórico Recente</h3>
+        <button
+          onClick={onExportPDF}
+          style={{ background: '#4b5563', color: 'white', border: 'none', padding: '5px 12px', borderRadius: '5px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.9rem' }}
+        >
+          📄 Baixar PDF
+        </button>
+      </div>
+
+      <div className="list-content">
+        {transactions.map((transaction) => (
+          <div key={transaction.id} className="transaction-item">
+            <div>
+              <strong style={{ display: 'block', fontSize: '1.1rem' }}>{transaction.description}</strong>
+              <small style={{ color: '#6b7280' }}>{transaction.date} • {transaction.category_name}</small>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+              <span style={{ fontWeight: 'bold', color: transaction.type === 'IN' ? '#10b981' : '#ef4444' }}>
+                {transaction.type === 'IN' ? '+' : '-'} R$ {transaction.amount}
+              </span>
+              <button onClick={() => onEdit(transaction)} style={{ border: 'none', background: 'none', cursor: 'pointer' }}>✏️</button>
+              <button onClick={() => onDelete(transaction.id)} style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#ef4444' }}>🗑️</button>
+            </div>
+          </div>
+        ))}
+        {transactions.length === 0 && <p style={{ textAlign: 'center', color: '#9ca3af', padding: '20px' }}>Nenhum lançamento neste mês.</p>}
+      </div>
+    </div>
+  );
+}
+
+export default TransactionList;
