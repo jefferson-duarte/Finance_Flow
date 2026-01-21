@@ -1,7 +1,8 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://127.0.0.1:8000/api/",
+  // Se existir uma variável de ambiente, usa ela. Senão, usa localhost.
+  baseURL: import.meta.env.VITE_API_URL || "http://127.0.0.1:8000/api/",
 });
 
 // 1. Interceptor de REQUISIÇÃO (Envia o Token)
