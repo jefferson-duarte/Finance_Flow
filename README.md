@@ -2,6 +2,8 @@
 
 **FinanceFlow** is a Fullstack Personal Finance Management application. It operates as a SaaS (Software as a Service) system, allowing multiple users to register, manage their own transactions securely, and visualize their financial data through dynamic dashboards.
 
+The application supports **multiple languages (English & Portuguese)** and features a modern, responsive design.
+
 ## 🚀 Tech Stack
 
 ### Backend (API)
@@ -14,6 +16,8 @@
 
 ### Frontend (User Interface)
 - **React.js** (via Vite): Component-based UI.
+- **React Context API**: Global state management for Internationalization (i18n).
+- **Container/Presenter Pattern**: Modular architecture for cleaner code.
 - **Axios**: HTTP client for API requests.
 - **Recharts**: Data visualization library.
 - **CSS Modules & Flexbox**: Custom professional styling with Sidebar layout.
@@ -21,6 +25,11 @@
 ---
 
 ## ✨ Key Features
+
+- **🌐 Internationalization (i18n):**
+  - Full support for **English (EN)** and **Portuguese (PT-BR)**.
+  - Language toggle available on both the Sidebar and Login screen.
+  - User preference persistence (saves language choice).
 
 - **✅ Secure Authentication:**
   - Split-screen Login and Registration pages with modern UI.
@@ -52,6 +61,28 @@
 
 ---
 
+## 📂 Project Structure
+
+The Frontend codebase follows the **Container/Presenter pattern** for better maintainability:
+
+```text
+src/
+  ├── components/        # Presentational Components (UI)
+  │    ├── Sidebar.jsx
+  │    ├── DashboardHeader.jsx
+  │    ├── SummaryCards.jsx
+  │    ├── TransactionForm.jsx
+  │    ├── TransactionList.jsx
+  │    └── ExpensesChart.jsx
+  ├── i18n/              # Translation Dictionaries
+  ├── LanguageContext.jsx # Global State for i18n
+  ├── App.jsx            # Main Container (Logic)
+  ├── Login.jsx          # Auth Screen
+  └── ...
+```
+
+---
+
 ## 🗺️ Development Roadmap
 
 Here is the progress of the project development:
@@ -65,6 +96,7 @@ Here is the progress of the project development:
 - [x] **Phase 7:** Automation with Signals (Default Categories).
 - [x] **Phase 8:** Date Filters & Category Manager.
 - [x] **Phase 9:** UI/UX Makeover (Sidebar, Modern Design, PDF Export, Profile).
+- [x] **Phase 10:** Refactoring (Components) & Internationalization (i18n).
 ---
 
 ## 🔧 How to Run the Project
