@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import api from './api';
 import { useLanguage } from './LanguageContext';
+import { ToastContainer, toast } from 'react-toastify';
+
 
 function Profile() {
   const { t } = useLanguage();
@@ -41,10 +43,10 @@ function Profile() {
       }
 
       await api.patch('profile/', dataToSend);
-      alert("Perfil atualizado com sucesso!");
+      toast.success("Perfil atualizado com sucesso! 🎉");
     } catch (error) {
       console.error(error);
-      alert("Erro ao atualizar. O nome de usuário pode já existir.");
+      toast.error("Erro ao atualizar. Tente outro nome de usuário.");
     }
   };
 
@@ -98,6 +100,8 @@ function Profile() {
           {t.btn_save_profile}
         </button>
       </form>
+      <ToastContainer position="top-right" autoClose={3000} theme="colored" />
+
     </div>
   );
 }

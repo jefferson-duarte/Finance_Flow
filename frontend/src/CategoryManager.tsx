@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import api from './api';
-
+import { toast } from 'react-toastify';
 import { useLanguage } from './LanguageContext';
 
 
@@ -16,9 +16,10 @@ function CategoryManager({ categories, onUpdate, onClose }) {
     try {
       await api.post('categories/', { name: newCategory });
       setNewCategory('');
+      toast.success("Categoria adicionada!");
       onUpdate(); // Avisa o App para recarregar a lista
     } catch (error) {
-      alert("Erro ao criar categoria.");
+      toast.error("Erro ao adicionar categoria.");
     }
   };
 
@@ -27,9 +28,10 @@ function CategoryManager({ categories, onUpdate, onClose }) {
     if (window.confirm("Tem certeza? As transações dessa categoria ficarão 'Sem Categoria'.")) {
       try {
         await api.delete(`categories/${id}/`);
+        toast.info("Categoria removida.");
         onUpdate();
       } catch (error) {
-        alert("Erro ao excluir.");
+        toast.error("Erro ao excluir.");
       }
     }
   };

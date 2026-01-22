@@ -4,6 +4,8 @@ import Login from './Login';
 import CategoryManager from './CategoryManager';
 import Profile from './Profile';
 import { useLanguage } from './LanguageContext';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
 
 // Componentes Novos
@@ -94,6 +96,7 @@ function App() {
   const handleLogout = () => {
     localStorage.removeItem("access_token");
     setIsAuthenticated(false);
+    toast.info("Você saiu do sistema. Até logo! 👋");
   };
 
   const prevMonth = () => {
@@ -123,9 +126,10 @@ function App() {
       if (editingTransaction) {
         await api.put(`transactions/${editingTransaction.id}/`, formData);
         setEditingTransaction(null);
-        alert("Transação atualizada!");
+        toast.success("Transação atualizada com sucesso! ✍️");
       } else {
         await api.post('transactions/', formData);
+        toast.success("Lançamento adicionado! 🚀");
       }
 
       setFormData({
@@ -138,7 +142,7 @@ function App() {
       fetchTransactions();
     } catch (error) {
       console.error("Erro ao salvar:", error);
-      alert("Erro ao salvar transação.");
+      toast.error("Erro ao salvar. Verifique os dados.");
     }
   };
 
@@ -146,9 +150,10 @@ function App() {
     if (confirm("Tem certeza que deseja excluir?")) {
       try {
         await api.delete(`transactions/${id}/`);
+        toast.info("Transação removida.");
         fetchTransactions();
       } catch (error) {
-        alert("Erro ao excluir.");
+        toast.error("Erro ao excluir.");
       }
     }
   };
@@ -265,6 +270,7 @@ function App() {
         )}
 
       </main>
+      <ToastContainer position="top-right" autoClose={3000} theme="colored" />
     </div>
   );
 }

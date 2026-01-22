@@ -1,8 +1,15 @@
 import { useState } from 'react';
 import api from './api';
 import { useLanguage } from './LanguageContext';
+import { ToastContainer, toast } from 'react-toastify';
 
-function Login({ onLogin }) {
+// 1. Definimos o tipo das propriedades que o componente aceita
+interface LoginProps {
+  onLogin: () => void;
+}
+
+// 2. Aplicamos o tipo aqui (LoginProps)
+function Login({ onLogin }: LoginProps) {
   const { t, changeLanguage, language } = useLanguage();
 
   const [isRegistering, setIsRegistering] = useState(false);
@@ -10,21 +17,24 @@ function Login({ onLogin }) {
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  // 3. Adicionamos o tipo do evento do formulário (React.FormEvent)
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault(); // Isso impede o refresh da página
+    
     try {
       if (isRegistering) {
         await api.post('register/', { username, password, email });
-        alert(t.alert_created);
+        toast.success(t.alert_created || "Conta criada! Faça login.");
         setIsRegistering(false);
       } else {
         const response = await api.post('token/', { username, password });
         localStorage.setItem("access_token", response.data.access);
+        toast.success(t.login_welcome || "Bem-vindo!");
         onLogin();
       }
     } catch (error) {
       console.error(error);
-      alert(isRegistering ? t.alert_error_create : t.alert_error_login);
+      toast.error(isRegistering ? (t.alert_error_create || "Erro ao criar conta") : (t.alert_error_login || "Dados inválidos"));
     }
   };
 
@@ -37,6 +47,7 @@ function Login({ onLogin }) {
         {/* --- NOVO: BOTÕES DE IDIOMA (Canto Superior Direito) --- */}
         <div style={{ position: 'absolute', top: '20px', right: '20px', display: 'flex', gap: '10px' }}>
           <button
+            type="button" // Importante: type="button" para não submeter o form ao clicar na bandeira
             onClick={() => changeLanguage('pt')}
             style={{
               background: language === 'pt' ? '#e0e7ff' : 'transparent',
@@ -49,7 +60,7 @@ function Login({ onLogin }) {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              opacity: language === 'pt' ? 1 : 0.5, // Deixa transparente se não estiver selecionado
+              opacity: language === 'pt' ? 1 : 0.5,
               transition: '0.2s'
             }}
             title="Português"
@@ -57,6 +68,7 @@ function Login({ onLogin }) {
             🇧🇷
           </button>
           <button
+            type="button" // Importante: type="button" para não submeter o form
             onClick={() => changeLanguage('en')}
             style={{
               background: language === 'en' ? '#e0e7ff' : 'transparent',
@@ -140,7 +152,9 @@ function Login({ onLogin }) {
           <p>{t.banner_text}</p>
         </div>
       </div>
-
+      
+      {/* Container de notificações */}
+      <ToastContainer position="top-right" autoClose={3000} theme="colored" />
     </div>
   );
 }
