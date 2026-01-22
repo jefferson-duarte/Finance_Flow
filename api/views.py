@@ -57,95 +57,130 @@ class ProfileView(generics.RetrieveUpdateAPIView):
         return self.request.user
 
 
-# --- ADICIONE ESTA NOVA CLASSE NO FINAL ---
 class ExportPDFView(generics.GenericAPIView):
-    # Essa view não precisa de Serializer, pois gera um arquivo
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
-        # 1. Filtros (Mesma lógica do Dashboard)
         month = request.query_params.get('month')
         year = request.query_params.get('year')
+        lang = request.query_params.get('lang', 'pt')
+
+        # 1. DEFINE A MOEDA BASEADA NO IDIOMA
+        currency_symbol = 'R$' if lang == 'pt' else '$'
+
+        texts = {
+            'pt': {
+                'title': 'FinanceFlow - Extrato Financeiro',
+                'user': 'Usuário',
+                'period': 'Período',
+                'generated': 'Gerado em',
+                'all': 'Todas as Transações',
+                'col_date': 'Data',
+                'col_cat': 'Categoria',
+                'col_desc': 'Descrição',
+                'col_type': 'Tipo',
+                # <--- Título da coluna dinâmico
+                'col_val': f'Valor ({currency_symbol})',
+                'in': 'Entrada',
+                'out': 'Saída',
+                'total_in': 'TOTAL ENTRADAS',
+                'total_out': 'TOTAL SAÍDAS',
+                'balance': 'SALDO FINAL'
+            },
+            'en': {
+                'title': 'FinanceFlow - Financial Statement',
+                'user': 'User',
+                'period': 'Period',
+                'generated': 'Generated on',
+                'all': 'All Transactions',
+                'col_date': 'Date',
+                'col_cat': 'Category',
+                'col_desc': 'Description',
+                'col_type': 'Type',
+                # <--- Título da coluna dinâmico
+                'col_val': f'Amount ({currency_symbol})',
+                'in': 'Income',
+                'out': 'Expense',
+                'total_in': 'TOTAL INCOME',
+                'total_out': 'TOTAL EXPENSES',
+                'balance': 'FINAL BALANCE'
+            }
+        }
+
+        t = texts.get(lang, texts['pt'])
 
         transactions = Transaction.objects.filter(user=request.user)
-
-        periodo_texto = "Todas as Transações"
+        periodo_texto = t['all']
         if month and year:
             transactions = transactions.filter(
                 date__month=month, date__year=year)
             periodo_texto = f"{month}/{year}"
 
-        # 2. Configuração do PDF
         response = HttpResponse(content_type='application/pdf')
-        # Se quiser que baixe direto, use 'attachment'. Se quiser ver no navegador, use 'inline'
-        filename = f"extrato_{periodo_texto.replace('/', '-')}.pdf"
+        filename = f"financeflow_{month}_{year}.pdf"
         response['Content-Disposition'] = f'attachment; filename="{filename}"'
 
-        # 3. Criando o Canvas (A folha em branco)
         p = canvas.Canvas(response, pagesize=A4)
         width, height = A4
 
-        # --- CABEÇALHO ---
+        # Cabeçalho
         p.setFont("Helvetica-Bold", 16)
-        p.drawString(50, height - 50, f"FinanceFlow - Extrato Financeiro")
+        p.drawString(50, height - 50, t['title'])
 
         p.setFont("Helvetica", 12)
-        p.drawString(50, height - 70, f"Usuário: {request.user.username}")
-        p.drawString(50, height - 85, f"Período: {periodo_texto}")
-        p.drawString(50, height - 100,
-                     f"Gerado em: {datetime.now().strftime('%d/%m/%Y %H:%M')}")
+        p.drawString(50, height - 70, f"{t['user']}: {request.user.username}")
+        p.drawString(50, height - 85, f"{t['period']}: {periodo_texto}")
+        p.drawString(
+            50, height - 100, f"{t['generated']}: {datetime.now().strftime('%d/%m/%Y %H:%M')}")
 
-        # --- TABELA DE DADOS ---
-        # Cabeçalhos da tabela
-        data = [['Data', 'Categoria', 'Descrição', 'Tipo', 'Valor (R$)']]
+        # Tabela
+        data = [[t['col_date'], t['col_cat'],
+                 t['col_desc'], t['col_type'], t['col_val']]]
 
-        # Preenchendo os dados
         total_entradas = 0
         total_saidas = 0
 
-        for t in transactions:
-            date_str = t.date.strftime('%d/%m/%Y')
-            tipo = "Entrada" if t.type == 'IN' else "Saída"
-            valor_str = f"{t.amount:.2f}"
+        for tr in transactions:
+            date_str = tr.date.strftime('%d/%m/%Y')
+            tipo_str = t['in'] if tr.type == 'IN' else t['out']
 
-            # Somatórios para o final
-            if t.type == 'IN':
-                total_entradas += t.amount
+            # 2. USA A VARIÁVEL DE MOEDA AQUI NOS VALORES
+            valor_str = f"{currency_symbol} {tr.amount:.2f}"
+
+            if tr.type == 'IN':
+                total_entradas += tr.amount
             else:
-                total_saidas += t.amount
+                total_saidas += tr.amount
 
-            data.append([date_str, t.category.name,
-                        t.description[:25], tipo, valor_str])
+            data.append([date_str, tr.category.name,
+                        tr.description[:25], tipo_str, valor_str])
 
-        # Adiciona linha de totais
-        data.append(['', '', 'TOTAL ENTRADAS', '', f"{total_entradas:.2f}"])
-        data.append(['', '', 'TOTAL SAÍDAS', '', f"{total_saidas:.2f}"])
+        # 3. USA A VARIÁVEL DE MOEDA NOS TOTAIS
+        data.append(['', '', t['total_in'], '',
+                    f"{currency_symbol} {total_entradas:.2f}"])
+        data.append(['', '', t['total_out'], '',
+                    f"{currency_symbol} {total_saidas:.2f}"])
         saldo = total_entradas - total_saidas
-        data.append(['', '', 'SALDO FINAL', '', f"{saldo:.2f}"])
+        data.append(['', '', t['balance'], '',
+                    f"{currency_symbol} {saldo:.2f}"])
 
-        # Configuração visual da Tabela
+        # Estilo da Tabela
         table = Table(data, colWidths=[70, 100, 170, 60, 80])
-
         style = TableStyle([
-            ('BACKGROUND', (0, 0), (-1, 0), colors.grey),  # Cor do cabeçalho
+            ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
             ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
             ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
             ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
             ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-            # Grade nas linhas normais
             ('GRID', (0, 0), (-1, -3), 1, colors.black),
-            ('LINEBELOW', (0, -3), (-1, -1), 1, colors.black),  # Linhas nos totais
-            ('FONTNAME', (0, -3), (-1, -1), 'Helvetica-Bold'),  # Negrito nos totais
+            ('LINEBELOW', (0, -3), (-1, -1), 1, colors.black),
+            ('FONTNAME', (0, -3), (-1, -1), 'Helvetica-Bold'),
         ])
 
         table.setStyle(style)
-
-        # Desenhar a tabela na posição X, Y
-        # O cálculo height - 150 é para começar abaixo do cabeçalho
         w, h = table.wrapOn(p, width, height)
         table.drawOn(p, 50, height - 140 - h)
 
-        # 4. Finalizar e Salvar
         p.showPage()
         p.save()
         return response

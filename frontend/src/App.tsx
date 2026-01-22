@@ -3,6 +3,7 @@ import api from './api';
 import Login from './Login';
 import CategoryManager from './CategoryManager';
 import Profile from './Profile';
+import { useLanguage } from './LanguageContext';
 import './App.css';
 
 // Componentes Novos
@@ -16,6 +17,8 @@ import ExpensesChart from './components/ExpensesChart';
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#AF19FF', '#FF4560'];
 
 function App() {
+  const { language } = useLanguage();
+
   const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem("access_token"));
   const [transactions, setTransactions] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -176,11 +179,14 @@ function App() {
     try {
       const year = currentDate.getFullYear();
       const month = currentDate.getMonth() + 1;
-      const response = await api.get(`export-pdf/?month=${month}&year=${year}`, { responseType: 'blob' });
+      const response = await api.get(`export-pdf/?month=${month}&year=${year}&lang=${language}`, { 
+        responseType: 'blob' 
+      });
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', `Extrato_${month}-${year}.pdf`);
+      const fileName = language === 'pt' ? `Extrato_${month}-${year}.pdf` : `Statement_${month}-${year}.pdf`;
+      link.setAttribute('download', fileName);      
       document.body.appendChild(link);
       link.click();
       link.remove();
